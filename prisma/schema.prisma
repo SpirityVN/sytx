@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+model contract {
+  id      String @id @unique @default(uuid())
+  name    String
+  abi_url String
+
+  event  event[]
+  method method[]
+}
+
+model event {
+  id   Int    @id @unique @default(autoincrement())
+  name String
+
+  contract_id String
+  contract    contract @relation(fields: [contract_id], references: [id])
+}
+
+model method {
+  id   Int    @id @unique @default(autoincrement())
+  name String
+
+  contract_id String
+  contract    contract @relation(fields: [contract_id], references: [id])
+}

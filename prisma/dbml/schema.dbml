@@ -1,0 +1,29 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table contract {
+  id String [pk, unique]
+  name String [not null]
+  abi_url String [not null]
+  event event [not null]
+  method method [not null]
+}
+
+Table event {
+  id Int [pk, increment, unique]
+  name String [not null]
+  contract_id String [not null]
+  contract contract [not null]
+}
+
+Table method {
+  id Int [pk, increment, unique]
+  name String [not null]
+  contract_id String [not null]
+  contract contract [not null]
+}
+
+Ref: event.contract_id > contract.id
+
+Ref: method.contract_id > contract.id
