@@ -6,6 +6,7 @@ Table contract {
   id String [pk, unique]
   name String [not null]
   abi_url String [not null]
+  address String [not null]
   event event [not null]
   method method [not null]
 }
@@ -13,6 +14,7 @@ Table contract {
 Table event {
   id Int [pk, increment, unique]
   name String [not null]
+  params Json [default: '{}']
   contract_id String [not null]
   contract contract [not null]
 }

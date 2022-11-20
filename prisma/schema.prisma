@@ -24,9 +24,9 @@ model contract {
 }
 
 model event {
-  id   Int    @id @unique @default(autoincrement())
-  name String
-
+  id          Int      @id @unique @default(autoincrement())
+  name        String
+  params      Json?    @default("{}")
   contract_id String
   contract    contract @relation(fields: [contract_id], references: [id])
 }
