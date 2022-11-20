@@ -85,13 +85,11 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
   }
 
   transformArgsEvent(values: ethers.utils.Result, keys: any[]) {
-    let args = [];
+    let args = {};
 
     if (values.length !== keys.length) return;
     keys.forEach((key, i) => {
-      args.push({
-        [key]: values[i],
-      });
+      args[key] = values[i];
     });
     return args;
   }
