@@ -15,12 +15,12 @@ generator dbml {
 }
 
 model contract {
-  id      String @id @unique @default(uuid())
+  id      String   @id @unique @default(uuid())
   name    String
   abi_url String
-
-  event  event[]
-  method method[]
+  address String
+  event   event[]
+  method  method[]
 }
 
 model event {

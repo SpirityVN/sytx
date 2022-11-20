@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { loggingMiddleware, PrismaModule } from 'nestjs-prisma';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Web3TransactionModule } from './web3-transaction/web3-transaction.module';
 import config from './common/config/config';
 
 @Module({
@@ -17,6 +18,7 @@ import config from './common/config/config';
         middlewares: [loggingMiddleware()],
       },
     }),
+    Web3TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
