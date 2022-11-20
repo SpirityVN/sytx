@@ -17,15 +17,6 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
     this.provider = new ethers.providers.WebSocketProvider(this.configService.get('RPC_NETWORK_URL') as string);
   }
 
-  convertArray2Object(arr) {
-    let temp = [];
-    for (let key in arr) {
-      let clone = Object.assign({}, arr[key]);
-      temp.push(clone);
-    }
-    return temp;
-  }
-
   async getTransaction(
     getTransactionInput: GetTransaction,
     contractDetail: contract & {
@@ -44,12 +35,15 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
       this.provider.getTransactionReceipt(getTransactionInput.txHash),
     ]);
 
-    let eventRaw = await contract.queryFilter(eventFilter, transactionReceipt.blockNumber, transactionReceipt.blockNumber + 4999);
+    let currentBlock = await this.provider.getBlock(transactionReceipt.blockHash);
 
-    let eventByTxHash = find(eventRaw, (e) => e.transactionHash === getTransactionInput.txHash);
+    let eventByTxHashRaw = await contract.queryFilter(eventFilter, transactionReceipt.blockNumber, transactionReceipt.blockNumber + 4999);
+
+    let eventByTxHash = find(eventByTxHashRaw, (e) => e.transactionHash === getTransactionInput.txHash);
 
     if (!eventByTxHash) return;
     return {
+      timestamp: currentBlock.timestamp,
       transaction: transactionReceipt,
       event: {
         ...eventByTxHash,
