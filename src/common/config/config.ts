@@ -10,7 +10,7 @@ const config: Config = {
   swagger: {
     enabled: process.env.NODE_ENV !== 'production' ? true : false,
     title: 'Welcome to the Spritiy.JSC',
-    description: 'Tarend API description',
+    description: 'SyTX API description',
     version: '0.1',
     path: 'api',
   },

@@ -1,7 +1,9 @@
 import { Web3TransactionService } from './web3-transaction.service';
 import { Body, Controller, Get, Param, Post, BadRequestException } from '@nestjs/common';
 import { CreateContractInput, GetContractDetail, GetTransaction } from './web3-transaction.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Web3 transaction')
 @Controller('web3-transaction')
 export class Web3TransactionController {
   constructor(private readonly web3TransactionService: Web3TransactionService) {}
@@ -18,7 +20,6 @@ export class Web3TransactionController {
 
   @Post()
   async createContract(@Body() payload: CreateContractInput) {
-    console.log(payload);
     return await this.web3TransactionService.createContract(payload);
   }
 }

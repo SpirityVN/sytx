@@ -5,19 +5,19 @@ import { AppModule } from './app.module';
 import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import { ConfigService } from '@nestjs/config';
 import fastifyCookie from '@fastify/cookie';
-import helmet from 'helmet';
 import type { NestConfig, SwaggerConfig } from '../src/common/config/config.interface';
 import { AllExceptionsFilter } from './common/exception/all-exception.filter';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { join } from 'path';
 import { SocketAdapter } from './adapter/socket.adapter';
+import helmet from '@fastify/helmet';
+import { contentParser } from 'fastify-multer';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   app.useWebSocketAdapter(new SocketAdapter(app));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
-  app.use(helmet());
 
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
@@ -26,12 +26,14 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   const configService = app.get(ConfigService);
+
   const nestConfig = configService.get<NestConfig>('nest');
+
   const swaggerConfig = configService.get<SwaggerConfig>('swagger');
   if (swaggerConfig.enabled) {
     const options = new DocumentBuilder()
-      .setTitle(swaggerConfig.title || 'Nestjs')
-      .setDescription(swaggerConfig.description || 'The nestjs API description')
+      .setTitle(swaggerConfig.title || 'SyTX')
+      .setDescription(swaggerConfig.description || 'The SyTX API description')
       .setVersion(swaggerConfig.version || '1.0')
       .addBearerAuth()
       .build();
@@ -39,6 +41,20 @@ async function bootstrap() {
 
     SwaggerModule.setup(swaggerConfig.path || 'api', app, document);
   }
+
+  app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+      },
+    },
+  });
+
+  app.register(contentParser);
+
   const fastifyCors = require('@fastify/cors');
   app.register(fastifyCors, {
     origin: function (origin, callback) {
@@ -64,9 +80,6 @@ async function bootstrap() {
       }
     },
     allowedHeaders: [
-      'x-msg-signature',
-      'x-signature',
-      'x-wallet-address',
       'Origin',
       'X-Requested-With',
       'X-HTTP-Method-Override',
@@ -98,7 +111,7 @@ async function bootstrap() {
     templates: join(__dirname, '..', 'views'),
   });
 
-  await app.listen(process.env.PORT || nestConfig.port || 3000, 'localhost', (err, address) => {
+  await app.listen(process.env.PORT || nestConfig.port || 3000, '0.0.0.0', (err, address) => {
     console.log('Start app.server.address', address);
     if (err) {
       console.error('app.err', err);
