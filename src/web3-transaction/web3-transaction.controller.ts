@@ -1,5 +1,5 @@
 import { Web3TransactionService } from './web3-transaction.service';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, BadRequestException } from '@nestjs/common';
 import { CreateContractInput, GetContractDetail, GetTransaction } from './web3-transaction.dto';
 
 @Controller('web3-transaction')
@@ -10,6 +10,7 @@ export class Web3TransactionController {
   async getTransaction(@Param('contractAddress') contractAddress: string, @Body() getTransactionInput: GetTransaction) {
     const contractDetail = await this.web3TransactionService.findContractByAddress(contractAddress);
 
+    if (!contractDetail) throw new BadRequestException('Contract not found');
     let transaction = await this.web3TransactionService.getTransaction(getTransactionInput, contractDetail);
 
     return transaction;
