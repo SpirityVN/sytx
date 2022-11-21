@@ -4,6 +4,7 @@ import { loggingMiddleware, PrismaModule } from 'nestjs-prisma';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Web3TransactionModule } from './web3-transaction/web3-transaction.module';
+import { FirebaseModule } from './firebase/firebase.module';
 import config from './common/config/config';
 
 @Module({
@@ -19,6 +20,7 @@ import config from './common/config/config';
       },
     }),
     Web3TransactionModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

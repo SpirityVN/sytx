@@ -65,6 +65,8 @@
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.6",
     "ethers": "^5.7.2",
+    "fastify-multer": "^2.0.3",
+    "firebase-admin": "^11.3.0",
     "handlebars": "^4.7.7",
     "helmet": "^6.0.0",
     "lodash": "^4.17.21",

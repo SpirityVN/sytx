@@ -6,23 +6,14 @@ import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import { ConfigService } from '@nestjs/config';
 import fastifyCookie from '@fastify/cookie';
 import helmet from 'helmet';
-import type {
-  NestConfig,
-  SwaggerConfig,
-} from '../src/common/config/config.interface';
+import type { NestConfig, SwaggerConfig } from '../src/common/config/config.interface';
 import { AllExceptionsFilter } from './common/exception/all-exception.filter';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { join } from 'path';
 import { SocketAdapter } from './adapter/socket.adapter';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   app.useWebSocketAdapter(new SocketAdapter(app));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -107,15 +98,11 @@ async function bootstrap() {
     templates: join(__dirname, '..', 'views'),
   });
 
-  await app.listen(
-    process.env.PORT || nestConfig.port || 3000,
-    '0.0.0.0',
-    (err, address) => {
-      console.log('Start app.server.address', address);
-      if (err) {
-        console.error('app.err', err);
-      }
-    },
-  );
+  await app.listen(process.env.PORT || nestConfig.port || 3000, 'localhost', (err, address) => {
+    console.log('Start app.server.address', address);
+    if (err) {
+      console.error('app.err', err);
+    }
+  });
 }
 bootstrap();
