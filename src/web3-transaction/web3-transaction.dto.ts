@@ -7,7 +7,7 @@ export class GetContractDetail {
   @ApiProperty()
   contractAddress: string;
 }
-export class GetTransaction {
+export class GetEventByTxHash {
   @ApiProperty()
   @IsEthereumAddress()
   myAddress: string;

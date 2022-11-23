@@ -18,7 +18,7 @@ model contract {
   id      String   @id @unique @default(uuid())
   name    String
   abi_url String
-  address String
+  address String   @unique
   event   event[]
   method  method[]
 }

@@ -1,3 +1,4 @@
+import { UploadABIResponse } from './firebase.dto';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
 import { ServiceAccount, storage } from 'firebase-admin';
@@ -13,19 +14,23 @@ export class FirebaseService {
     this.storage = this.firebaseApp.storage();
   }
 
-  async uploadABI(file: Express.Multer.File): Promise<string> {
+  async uploadABI(file: Express.Multer.File): Promise<UploadABIResponse> {
     try {
       let bucket = this.storage.bucket('gs://sytx-ce64a.appspot.com/');
 
       let random = (Math.random() + 1).toString(36).substring(7);
 
-      let fileCloud = await bucket.file(`${file.originalname.split('.')[0]}_${random}.json`);
+      let filename = `${file.originalname.split('.')[0]}_${random}.json`;
+      let fileCloud = await bucket.file(filename);
 
       await fileCloud.save(file.buffer, {
         contentType: file.mimetype,
         public: true,
       });
-      return fileCloud.publicUrl();
+      return {
+        filename: filename,
+        image_url: fileCloud.publicUrl(),
+      };
     } catch (error) {
       throw new BadRequestException('Upload ABI failed.');
     }
