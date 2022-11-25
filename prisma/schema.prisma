@@ -21,6 +21,9 @@ model contract {
   address String   @unique
   event   event[]
   method  method[]
+
+  network_support_id Int
+  network_support    network_support @relation(fields: [network_support_id], references: [id])
 }
 
 model event {
@@ -37,4 +40,15 @@ model method {
 
   contract_id String
   contract    contract @relation(fields: [contract_id], references: [id])
+}
+
+model network_support {
+  id                 Int        @id @unique @default(autoincrement())
+  name               String
+  rpc_url            String
+  rpc_url_backup     String?
+  chain_id           Int
+  currency_symbol    String?
+  block_explorer_url String?
+  contract           contract[]
 }

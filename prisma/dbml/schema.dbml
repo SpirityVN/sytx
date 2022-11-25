@@ -9,6 +9,8 @@ Table contract {
   address String [unique, not null]
   event event [not null]
   method method [not null]
+  network_support_id Int [not null]
+  network_support network_support [not null]
 }
 
 Table event {
@@ -25,6 +27,19 @@ Table method {
   contract_id String [not null]
   contract contract [not null]
 }
+
+Table network_support {
+  id Int [pk, increment, unique]
+  name String [not null]
+  rpc_url String [not null]
+  rpc_url_backup String
+  chain_id Int [not null]
+  currency_symbol String
+  block_explorer_url String
+  contract contract [not null]
+}
+
+Ref: contract.network_support_id > network_support.id
 
 Ref: event.contract_id > contract.id
 
