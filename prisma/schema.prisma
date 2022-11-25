@@ -45,6 +45,8 @@ model method {
 model network_support {
   id                 Int        @id @unique @default(autoincrement())
   name               String
+  icon_network_url   String?
+  icon_currency_url  String?
   rpc_url            String
   rpc_url_backup     String?
   chain_id           Int
