@@ -20,7 +20,6 @@ export class Web3TransactionController {
 
   @Post('/create-contract')
   async createContract(@Body() payload: CreateContractInput) {
-    console.log(payload);
     return await this.web3TransactionService.createContract(payload);
   }
 
