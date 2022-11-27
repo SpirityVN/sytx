@@ -51,7 +51,7 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
       this.provider.getTransaction(getEventByTxHashInput.txHash),
     ]);
 
-    let eventByTxHashRaws = await contract.queryFilter(eventFilter, transaction.blockNumber);
+    let eventByTxHashRaws = await contract.queryFilter(eventFilter, transaction.blockNumber, transaction.blockNumber + 4999);
 
     //TODO: get transaction over 50000 blocks
 
