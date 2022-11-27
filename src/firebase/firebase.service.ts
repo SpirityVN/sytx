@@ -29,7 +29,7 @@ export class FirebaseService {
       });
       return {
         filename: filename,
-        image_url: fileCloud.publicUrl(),
+        url: fileCloud.publicUrl(),
       };
     } catch (error) {
       throw new BadRequestException('Upload ABI failed.');
