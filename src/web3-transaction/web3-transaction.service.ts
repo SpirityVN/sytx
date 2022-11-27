@@ -80,7 +80,6 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
   }
 
   createNetwork(payload: CreateNetworkInput) {
-    console.log(payload);
     return this.prismaService.network_support.create({
       data: {
         name: payload.networkName,
