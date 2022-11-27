@@ -59,7 +59,6 @@ export class CreateNetworkInput {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
   networkType: NetworkSupportType;
 
   @ApiProperty()
@@ -69,14 +68,16 @@ export class CreateNetworkInput {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsUrl()
   rpcUrl: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsOptional()
-  @IsUrl()
   rpcUrlBackup: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  iconNetworkUrl: string;
 
   @ApiProperty()
   @IsOptional()
@@ -85,6 +86,5 @@ export class CreateNetworkInput {
 
   @ApiProperty()
   @IsOptional()
-  @IsUrl()
   blockExplorerUrl: string;
 }
