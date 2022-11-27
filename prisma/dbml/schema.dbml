@@ -31,12 +31,20 @@ Table method {
 Table network_support {
   id Int [pk, increment, unique]
   name String [not null]
+  icon_network_url String
+  icon_currency_url String
   rpc_url String [not null]
   rpc_url_backup String
   chain_id Int [not null]
+  type NetworkSupportType [not null]
   currency_symbol String
   block_explorer_url String
   contract contract [not null]
+}
+
+Enum NetworkSupportType {
+  testnet
+  mainnet
 }
 
 Ref: contract.network_support_id > network_support.id

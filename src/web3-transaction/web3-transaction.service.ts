@@ -84,6 +84,7 @@ export class Web3TransactionService extends BaseService implements OnModuleInit 
       data: {
         name: payload.networkName,
         chain_id: payload.chainId,
+        type: payload.networkType,
         rpc_url: payload.rpcUrl,
         rpc_url_backup: payload.rpcUrlBackup,
         block_explorer_url: payload.blockExplorerUrl,

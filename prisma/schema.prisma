@@ -43,14 +43,20 @@ model method {
 }
 
 model network_support {
-  id                 Int        @id @unique @default(autoincrement())
+  id                 Int                @id @unique @default(autoincrement())
   name               String
   icon_network_url   String?
   icon_currency_url  String?
   rpc_url            String
   rpc_url_backup     String?
   chain_id           Int
+  type               NetworkSupportType
   currency_symbol    String?
   block_explorer_url String?
   contract           contract[]
+}
+
+enum NetworkSupportType {
+  testnet
+  mainnet
 }

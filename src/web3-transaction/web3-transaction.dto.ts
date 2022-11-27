@@ -1,6 +1,6 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { NetworkSupportType, Prisma } from '@prisma/client';
 import { IsArray, IsEthereumAddress, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class GetContractDetail {
@@ -56,6 +56,11 @@ export class CreateNetworkInput {
   @IsNotEmpty()
   @IsString()
   networkName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  networkType: NetworkSupportType;
 
   @ApiProperty()
   @IsNotEmpty()
