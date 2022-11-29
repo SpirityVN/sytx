@@ -112,7 +112,8 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT || nestConfig.port || 3000, '0.0.0.0', (err, address) => {
-    console.log('Start app.server.address', address);
+    console.log('Start app.server.address:', address);
+    console.log('Start app.server.database:', process.env.DATABASE_URL as string);
     if (err) {
       console.error('app.err', err);
     }

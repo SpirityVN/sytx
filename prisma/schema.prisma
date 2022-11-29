@@ -15,31 +15,13 @@ generator dbml {
 }
 
 model contract {
-  id      String   @id @unique @default(uuid())
+  id      String @id @unique @default(uuid())
   name    String
   abi_url String
-  address String   @unique
-  event   event[]
-  method  method[]
+  address String @unique
 
   network_support_id Int
   network_support    network_support @relation(fields: [network_support_id], references: [id])
-}
-
-model event {
-  id          Int      @id @unique @default(autoincrement())
-  name        String
-  params      Json?    @default("{}")
-  contract_id String
-  contract    contract @relation(fields: [contract_id], references: [id])
-}
-
-model method {
-  id   Int    @id @unique @default(autoincrement())
-  name String
-
-  contract_id String
-  contract    contract @relation(fields: [contract_id], references: [id])
 }
 
 model network_support {

@@ -7,25 +7,8 @@ Table contract {
   name String [not null]
   abi_url String [not null]
   address String [unique, not null]
-  event event [not null]
-  method method [not null]
   network_support_id Int [not null]
   network_support network_support [not null]
-}
-
-Table event {
-  id Int [pk, increment, unique]
-  name String [not null]
-  params Json [default: '{}']
-  contract_id String [not null]
-  contract contract [not null]
-}
-
-Table method {
-  id Int [pk, increment, unique]
-  name String [not null]
-  contract_id String [not null]
-  contract contract [not null]
 }
 
 Table network_support {
@@ -48,7 +31,3 @@ Enum NetworkSupportType {
 }
 
 Ref: contract.network_support_id > network_support.id
-
-Ref: event.contract_id > contract.id
-
-Ref: method.contract_id > contract.id
