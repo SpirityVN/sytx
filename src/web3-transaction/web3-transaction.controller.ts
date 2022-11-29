@@ -1,7 +1,9 @@
+import Axios from 'axios';
 import { Web3TransactionService } from './web3-transaction.service';
 import { Body, Controller, Get, Param, Post, BadRequestException } from '@nestjs/common';
-import { CreateContractInput, CreateNetworkInput, GetContractDetail, GetEventByTxHash } from './web3-transaction.dto';
+import { CreateContractInput, CreateNetworkInput, GetEventByTxHash } from './web3-transaction.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { transformEventByABI } from './web3-transaction.util';
 
 @ApiTags('Web3 transaction')
 @Controller('web3-transaction')
@@ -35,7 +37,17 @@ export class Web3TransactionController {
 
   @Get('/contract/:id')
   async getContractDetail(@Param('id') contractId: string) {
-    return await this.web3TransactionService.getContractDetail(contractId);
+    const contractDetail = await this.web3TransactionService.getContractDetail(contractId);
+    let contractEvents = null;
+    let { data } = await Axios.get(contractDetail.abi_url);
+    if (data) {
+      contractEvents = transformEventByABI(data);
+    }
+
+    return {
+      ...contractDetail,
+      events: contractEvents,
+    };
   }
 
   @Get('/networks')

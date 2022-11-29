@@ -1,7 +1,6 @@
-import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { NetworkSupportType, Prisma } from '@prisma/client';
-import { IsArray, IsEthereumAddress, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import { NetworkSupportType } from '@prisma/client';
+import { IsEthereumAddress, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class GetContractDetail {
   @ApiProperty()
@@ -21,10 +20,6 @@ export class GetEventByTxHash {
   eventName: string;
 }
 
-class Event {
-  name: string;
-  params: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
-}
 export class CreateContractInput {
   @ApiProperty()
   @IsNotEmpty()
@@ -38,12 +33,6 @@ export class CreateContractInput {
   @ApiProperty()
   @IsNotEmpty()
   contractAddress: string;
-
-  @ApiProperty({
-    isArray: true,
-  })
-  @IsNotEmpty()
-  events: Event;
 
   @ApiProperty()
   @IsNumber()
