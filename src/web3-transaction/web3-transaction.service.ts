@@ -2,11 +2,11 @@ import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
 import Axios from 'axios';
-import { Contract, ethers } from 'ethers';
+import { Contract, ethers, Event } from 'ethers';
 import { find, isEmpty, map, pick } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { BaseService } from 'src/_services/base.service';
-import { CreateContractInput, GetEventByTxHash, CreateNetworkInput } from './web3-transaction.dto';
+import { CreateContractInput, GetEventByTxHash, CreateNetworkInput, GetEventAll } from './web3-transaction.dto';
 import { transformEventByABI } from './web3-transaction.util';
 @Injectable()
 export class Web3TransactionService extends BaseService {
@@ -24,19 +24,90 @@ export class Web3TransactionService extends BaseService {
     return args;
   }
 
+  private _getProviderByContract(
+    contractDetail: contract & {
+      network_support: network_support;
+    },
+  ) {
+    const provider =
+      this.exportProviderViaURL(contractDetail.network_support.rpc_url) || this.exportProviderViaURL(contractDetail.network_support.rpc_url_backup);
+    return provider;
+  }
+
+  async _getABIByContract(
+    contractDetail: contract & {
+      network_support: network_support;
+    },
+  ) {
+    const { data } = await Axios.get(contractDetail.abi_url);
+
+    const abi = data['abi'] || data;
+
+    if (!abi) throw new BadRequestException('ABI not found!');
+
+    return abi;
+  }
+
+  private _getRangeBlocks(startBlock, latestBlock): { startBlock: number; endBlock: number }[] {
+    let rangeBlocks = new Array();
+    while (startBlock < latestBlock) {
+      if (startBlock + 5000 < latestBlock) {
+        rangeBlocks.push({
+          startBlock: startBlock,
+          endBlock: startBlock + 5000,
+        });
+      } else {
+        rangeBlocks.push({
+          startBlock: startBlock,
+          endBlock: startBlock + 5000,
+        });
+      }
+      startBlock += 5001;
+    }
+    return rangeBlocks;
+  }
+
+  async getEventALl(input: GetEventAll, contractDetail: contract & { network_support: network_support }) {
+    const abi = await this._getABIByContract(contractDetail);
+
+    const provider = this._getProviderByContract(contractDetail);
+
+    const contract = new Contract(contractDetail.address, abi, provider);
+
+    let contractEvents = transformEventByABI(abi);
+
+    let eventContractDetail = find(contractEvents, { name: input.eventName });
+    if (!eventContractDetail) throw new BadRequestException('Event invalid');
+
+    let eventFilter = contract.filters[`${eventContractDetail.name}`](null, null);
+
+    let latestBlock = await provider.getBlockNumber();
+    console.log(latestBlock);
+
+    if (input.startBlock > latestBlock) throw new BadRequestException('start block invalid!');
+
+    let startBlock = input.startBlock;
+
+    let eventRaws: Event[] = [];
+
+    let rangeBlocks = this._getRangeBlocks(startBlock, latestBlock);
+
+    console.log(rangeBlocks);
+  }
+
   async getEventByTxHash(
     getEventByTxHashInput: GetEventByTxHash,
     contractDetail: contract & {
       network_support: network_support;
     },
   ) {
-    const abi = await Axios.get(contractDetail.abi_url);
+    const abi = await this._getABIByContract(contractDetail);
 
-    const provider =
-      this.exportProviderViaURL(contractDetail.network_support.rpc_url) || this.exportProviderViaURL(contractDetail.network_support.rpc_url_backup);
-    const contract = new Contract(contractDetail.address, abi.data, provider);
+    const provider = this._getProviderByContract(contractDetail);
 
-    let contractEvents = transformEventByABI(abi.data);
+    const contract = new Contract(contractDetail.address, abi, provider);
+
+    let contractEvents = transformEventByABI(abi);
 
     let eventContractDetail = find(contractEvents, { name: getEventByTxHashInput.eventName });
     if (!eventContractDetail) throw new BadRequestException('Event invalid');

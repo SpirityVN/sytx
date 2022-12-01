@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import { Web3TransactionService } from './web3-transaction.service';
 import { Body, Controller, Get, Param, Post, BadRequestException } from '@nestjs/common';
-import { CreateContractInput, CreateNetworkInput, GetEventByTxHash } from './web3-transaction.dto';
+import { CreateContractInput, CreateNetworkInput, GetEventAll, GetEventByTxHash } from './web3-transaction.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { transformEventByABI } from './web3-transaction.util';
 
@@ -10,6 +10,15 @@ import { transformEventByABI } from './web3-transaction.util';
 export class Web3TransactionController {
   constructor(private readonly web3TransactionService: Web3TransactionService) {}
 
+  @Post('/:contractAddress/find-all/event')
+  async findAllEvent(@Param('contractAddress') contractAddress: string, @Body() input: GetEventAll) {
+    const contractDetail = await this.web3TransactionService.findContractByAddress(contractAddress);
+
+    if (!contractDetail) throw new BadRequestException('Contract not found');
+
+    let transaction = await this.web3TransactionService.getEventALl(input, contractDetail);
+    return transaction;
+  }
   @Post('/:contractAddress/transaction')
   async getTransaction(@Param('contractAddress') contractAddress: string, @Body() getEventByTxHashInput: GetEventByTxHash) {
     const contractDetail = await this.web3TransactionService.findContractByAddress(contractAddress);

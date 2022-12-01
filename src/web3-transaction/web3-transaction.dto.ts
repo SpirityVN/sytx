@@ -6,6 +6,20 @@ export class GetContractDetail {
   @ApiProperty()
   contractAddress: string;
 }
+
+export class GetEventAll {
+  @ApiProperty()
+  @IsNotEmpty()
+  eventName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  startBlock: number;
+
+  @ApiProperty()
+  @IsOptional()
+  limit: number;
+}
 export class GetEventByTxHash {
   @ApiProperty()
   @IsEthereumAddress()
