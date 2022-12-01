@@ -48,21 +48,21 @@ export class Web3TransactionService extends BaseService {
     return abi;
   }
 
-  private _getRangeBlocks(startBlock, latestBlock): { startBlock: number; endBlock: number }[] {
+  private _getRangeBlocks(startBlock, latestBlock, step: number = 5000): { startBlock: number; endBlock: number }[] {
     let rangeBlocks = new Array();
     while (startBlock < latestBlock) {
-      if (startBlock + 5000 < latestBlock) {
+      if (startBlock + step < latestBlock) {
         rangeBlocks.push({
           startBlock: startBlock,
-          endBlock: startBlock + 5000,
+          endBlock: startBlock + step,
         });
       } else {
         rangeBlocks.push({
           startBlock: startBlock,
-          endBlock: startBlock + 5000,
+          endBlock: startBlock + step,
         });
       }
-      startBlock += 5001;
+      startBlock += step + 1;
     }
     return rangeBlocks;
   }
