@@ -2,12 +2,13 @@ import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
 import Axios from 'axios';
-import { Contract, ethers, Event } from 'ethers';
-import { find, isEmpty, map, pick } from 'lodash';
+import { Contract, ethers, Event, EventFilter } from 'ethers';
+import { chunk, find, forEach, isEmpty, map, pick, range } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { BaseService } from 'src/_services/base.service';
 import { CreateContractInput, GetEventByTxHash, CreateNetworkInput, GetEventAll } from './web3-transaction.dto';
 import { transformEventByABI } from './web3-transaction.util';
+
 @Injectable()
 export class Web3TransactionService extends BaseService {
   constructor(private readonly configService: ConfigService, private readonly prismaService: PrismaService) {
@@ -90,9 +91,7 @@ export class Web3TransactionService extends BaseService {
 
     let eventRaws: Event[] = [];
 
-    let rangeBlocks = this._getRangeBlocks(startBlock, latestBlock);
-
-    console.log(rangeBlocks);
+    let rangeBlocks = chunk(this._getRangeBlocks(startBlock, latestBlock), 5);
   }
 
   async getEventByTxHash(
