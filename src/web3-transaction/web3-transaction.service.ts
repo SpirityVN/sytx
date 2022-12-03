@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
 import Axios from 'axios';
 import { Contract, ethers, Event, EventFilter } from 'ethers';
-import { chunk, find, forEach, isEmpty, map, pick, range } from 'lodash';
+import _, { chunk, find, forEach, isEmpty, map, mapValues, pick, range, values } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { BaseService } from 'src/_services/base.service';
 import { CreateContractInput, GetEventByTxHash, CreateNetworkInput, GetEventAll } from './web3-transaction.dto';
@@ -68,30 +68,43 @@ export class Web3TransactionService extends BaseService {
     return rangeBlocks;
   }
 
-  async getEventALl(input: GetEventAll, contractDetail: contract & { network_support: network_support }) {
-    const abi = await this._getABIByContract(contractDetail);
+  async getEventAll(input: GetEventAll, contractDetail: contract & { network_support: network_support }) {
+    return this.fetchCacheable(`${input.eventName}-${input.startBlock}`, async () => {
+      const abi = await this._getABIByContract(contractDetail);
 
-    const provider = this._getProviderByContract(contractDetail);
+      const provider = this._getProviderByContract(contractDetail);
 
-    const contract = new Contract(contractDetail.address, abi, provider);
+      const contract = new Contract(contractDetail.address, abi, provider);
 
-    let contractEvents = transformEventByABI(abi);
+      let contractEvents = transformEventByABI(abi);
 
-    let eventContractDetail = find(contractEvents, { name: input.eventName });
-    if (!eventContractDetail) throw new BadRequestException('Event invalid');
+      let eventContractDetail = find(contractEvents, { name: input.eventName });
+      if (!eventContractDetail) throw new BadRequestException('Event invalid');
 
-    let eventFilter = contract.filters[`${eventContractDetail.name}`](null, null);
+      let eventFilter = contract.filters[`${eventContractDetail.name}`](null, null);
 
-    let latestBlock = await provider.getBlockNumber();
-    console.log(latestBlock);
+      let latestBlock = await provider.getBlockNumber();
 
-    if (input.startBlock > latestBlock) throw new BadRequestException('start block invalid!');
+      if (input.startBlock > latestBlock) throw new BadRequestException('start block invalid!');
 
-    let startBlock = input.startBlock;
+      let startBlock = input.startBlock;
 
-    let eventRaws: Event[] = [];
+      let eventRaws: Event[] = [];
 
-    let rangeBlocks = chunk(this._getRangeBlocks(startBlock, latestBlock), 5);
+      let rangeBlocks = chunk(this._getRangeBlocks(startBlock, latestBlock), 10);
+
+      for (let i of rangeBlocks) {
+        let data = await this._getEventRange(contract, eventFilter, i);
+        if (data.length !== 0) {
+          eventRaws.push(...data);
+        }
+      }
+
+      return eventRaws.map((event) => ({
+        ...event,
+        args: this._transformArgsEvent(event.args, eventContractDetail.params),
+      }));
+    });
   }
 
   async getEventByTxHash(
@@ -230,5 +243,17 @@ export class Web3TransactionService extends BaseService {
 
   updateNetwork() {
     //TODO: code here
+  }
+
+  async _getEventRange(contract: Contract, eventFilter: EventFilter, rangeBlocks: { startBlock: number; endBlock: number }[]) {
+    let events: Event[] = [];
+
+    for (let rangeBlock of rangeBlocks) {
+      let rse = await contract.queryFilter(eventFilter, rangeBlock.startBlock, rangeBlock.endBlock);
+      if (rse.length !== 0) {
+        events.push(...rse);
+      }
+    }
+    return events;
   }
 }

@@ -16,7 +16,7 @@ export class Web3TransactionController {
 
     if (!contractDetail) throw new BadRequestException('Contract not found');
 
-    let transaction = await this.web3TransactionService.getEventALl(input, contractDetail);
+    let transaction = await this.web3TransactionService.getEventAll(input, contractDetail);
     return transaction;
   }
   @Post('/:contractAddress/transaction')

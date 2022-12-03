@@ -18,7 +18,7 @@ export class GetEventAll {
 
   @ApiProperty()
   @IsOptional()
-  limit: number;
+  limit?: number = 5;
 }
 export class GetEventByTxHash {
   @ApiProperty()
