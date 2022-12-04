@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
-import Axios from 'axios';
-import { Contract, ethers, Event, EventFilter } from 'ethers';
-import _, { chunk, find, forEach, isEmpty, map, mapValues, pick, range, values } from 'lodash';
+import { Contract, Event, EventFilter } from 'ethers';
+import _, { chunk, find, isEmpty, map, pick } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { BaseService } from 'src/_services/base.service';
 import { CreateContractInput, GetEventByTxHash, CreateNetworkInput, GetEventAll } from './web3-transaction.dto';
-import { transformEventByABI } from './web3-transaction.util';
+import { getABIByContract, getProviderByContract, getRangeBlocks, transformArgsEvent, transformEventByABI } from './web3-transaction.util';
 
 @Injectable()
 export class Web3TransactionService extends BaseService {
@@ -15,64 +14,11 @@ export class Web3TransactionService extends BaseService {
     super();
   }
 
-  private _transformArgsEvent(values: ethers.utils.Result, keys: any[]) {
-    let args = {};
-
-    if (values.length !== keys.length) return;
-    keys.forEach((key, i) => {
-      args[key] = values[i];
-    });
-    return args;
-  }
-
-  private _getProviderByContract(
-    contractDetail: contract & {
-      network_support: network_support;
-    },
-  ) {
-    const provider =
-      this.exportProviderViaURL(contractDetail.network_support.rpc_url) || this.exportProviderViaURL(contractDetail.network_support.rpc_url_backup);
-    return provider;
-  }
-
-  async _getABIByContract(
-    contractDetail: contract & {
-      network_support: network_support;
-    },
-  ) {
-    const { data } = await Axios.get(contractDetail.abi_url);
-
-    const abi = data['abi'] || data;
-
-    if (!abi) throw new BadRequestException('ABI not found!');
-
-    return abi;
-  }
-
-  private _getRangeBlocks(startBlock, latestBlock, step: number = 5000): { startBlock: number; endBlock: number }[] {
-    let rangeBlocks = new Array();
-    while (startBlock < latestBlock) {
-      if (startBlock + step < latestBlock) {
-        rangeBlocks.push({
-          startBlock: startBlock,
-          endBlock: startBlock + step,
-        });
-      } else {
-        rangeBlocks.push({
-          startBlock: startBlock,
-          endBlock: startBlock + step,
-        });
-      }
-      startBlock += step + 1;
-    }
-    return rangeBlocks;
-  }
-
   async getEventAll(input: GetEventAll, contractDetail: contract & { network_support: network_support }) {
     return this.fetchCacheable(`${input.eventName}-${input.startBlock}`, async () => {
-      const abi = await this._getABIByContract(contractDetail);
+      const abi = await getABIByContract(contractDetail);
 
-      const provider = this._getProviderByContract(contractDetail);
+      const provider = getProviderByContract(contractDetail);
 
       const contract = new Contract(contractDetail.address, abi, provider);
 
@@ -87,11 +33,9 @@ export class Web3TransactionService extends BaseService {
 
       if (input.startBlock > latestBlock) throw new BadRequestException('start block invalid!');
 
-      let startBlock = input.startBlock;
-
       let eventRaws: Event[] = [];
 
-      let rangeBlocks = chunk(this._getRangeBlocks(startBlock, latestBlock), 10);
+      let rangeBlocks = chunk(getRangeBlocks(input.startBlock, latestBlock), 10);
 
       for (let i of rangeBlocks) {
         let data = await this._getEventRange(contract, eventFilter, i);
@@ -102,7 +46,7 @@ export class Web3TransactionService extends BaseService {
 
       return eventRaws.map((event) => ({
         ...event,
-        args: this._transformArgsEvent(event.args, eventContractDetail.params),
+        args: transformArgsEvent(event.args, eventContractDetail.params),
       }));
     });
   }
@@ -113,9 +57,9 @@ export class Web3TransactionService extends BaseService {
       network_support: network_support;
     },
   ) {
-    const abi = await this._getABIByContract(contractDetail);
+    const abi = await getABIByContract(contractDetail);
 
-    const provider = this._getProviderByContract(contractDetail);
+    const provider = getProviderByContract(contractDetail);
 
     const contract = new Contract(contractDetail.address, abi, provider);
 
@@ -145,24 +89,11 @@ export class Web3TransactionService extends BaseService {
         ...pick(eventByTxHashRaw, ['event', 'blockNumber', 'blockHash', 'transactionHash']),
         ...pick(await eventByTxHashRaw.getTransactionReceipt(), ['from', 'to', 'status']),
         timestamp: (await eventByTxHashRaw.getBlock()).timestamp,
-        eventValue: this._transformArgsEvent(eventByTxHashRaw.args, eventContractDetail.params as String[]),
+        eventValue: transformArgsEvent(eventByTxHashRaw.args, eventContractDetail.params as String[]),
       })),
     );
   }
 
-  exportProviderViaURL(providerUrl: string) {
-    try {
-      if (/^(https|http)/i.test(providerUrl)) {
-        return new ethers.providers.JsonRpcProvider(providerUrl);
-      }
-      if (/^(wss|ws)/i.test(providerUrl)) {
-        return new ethers.providers.WebSocketProvider(providerUrl);
-      }
-      return;
-    } catch (error) {
-      return;
-    }
-  }
   async findContractByAddress(contractAddress: string) {
     return this.prismaService.contract.findFirst({
       where: {
