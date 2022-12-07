@@ -148,12 +148,10 @@ export class Web3TransactionService extends BaseService {
   }
 
   getListContracts() {
-    return this.fetchCacheable('get-list-contract', () => {
-      return this.prismaService.contract.findMany({
-        include: {
-          network_support: true,
-        },
-      });
+    return this.prismaService.contract.findMany({
+      include: {
+        network_support: true,
+      },
     });
   }
 
