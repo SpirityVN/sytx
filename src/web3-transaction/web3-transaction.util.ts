@@ -20,7 +20,7 @@ export function flattenObject(Objects: Object, key: string) {
   return map(Objects, (object) => object[key]);
 }
 
-export function transformEventByABI(abi: any): { name: string; params: string[] }[] {
+export function transformEventByABI(abi): { name: string; params: string[] }[] {
   const events: ABIEvent[] = filter(abi, { type: 'event' });
   if (events.length === 0) return;
   return map(events, (event) => ({
