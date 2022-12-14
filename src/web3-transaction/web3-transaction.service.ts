@@ -22,12 +22,12 @@ export class Web3TransactionService extends BaseService {
 
       const contract = new Contract(contractDetail.address, abi, provider);
 
-      let contractEvents = transformEventByABI(abi);
+      const contractEvents = transformEventByABI(abi);
 
       let eventContractDetail = find(contractEvents, { name: input.eventName });
       if (!eventContractDetail) throw new BadRequestException('Event invalid');
 
-      let eventFilter = contract.filters[`${eventContractDetail.name}`](null, null);
+      const eventFilter = contract.filters[`${eventContractDetail.name}`](null, null);
 
       let latestBlock = await provider.getBlockNumber();
 
@@ -63,9 +63,9 @@ export class Web3TransactionService extends BaseService {
 
     const contract = new Contract(contractDetail.address, abi, provider);
 
-    let contractEvents = transformEventByABI(abi);
+    const contractEvents = transformEventByABI(abi);
 
-    let eventContractDetail = find(contractEvents, { name: getEventByTxHashInput.eventName });
+    const eventContractDetail = find(contractEvents, { name: getEventByTxHashInput.eventName });
     if (!eventContractDetail) throw new BadRequestException('Event invalid');
 
     let [eventFilter, transaction] = await Promise.all([
