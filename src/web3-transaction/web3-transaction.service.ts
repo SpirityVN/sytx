@@ -74,7 +74,7 @@ export class Web3TransactionService extends BaseService {
 
         List all transaction via Event of Smart Contract *from* myAddress
       */
-      contract.filters[`${eventContractDetail.name}`](getEventByTxHashInput.myAddress),
+      contract.filters[`${eventContractDetail.name}`](getEventByTxHashInput.myAddress || null),
       provider.getTransaction(getEventByTxHashInput.txHash),
     ]);
 

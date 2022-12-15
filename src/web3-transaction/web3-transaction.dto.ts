@@ -23,7 +23,8 @@ export class GetEventAll {
 export class GetEventByTxHash {
   @ApiProperty()
   @IsEthereumAddress()
-  myAddress: string;
+  @IsOptional()
+  myAddress?: string;
 
   @ApiProperty()
   @IsNotEmpty()
