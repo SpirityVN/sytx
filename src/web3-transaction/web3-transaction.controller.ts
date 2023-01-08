@@ -14,6 +14,7 @@ export class Web3TransactionController {
   async findAllEvent(@Param('contractAddress') contractAddress: string, @Body() input: GetEventAll) {
     const contractDetail = await this.web3TransactionService.findContractByAddress(contractAddress);
 
+
     if (!contractDetail) throw new BadRequestException('Contract not found');
 
     let transaction = await this.web3TransactionService.getEventAll(input, contractDetail);

@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Web3TransactionModule } from './web3-transaction/web3-transaction.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { LuckyWheelModule } from './lucky-wheel/lucky-wheel.module';
 import config from './common/config/config';
 
 @Module({
@@ -21,6 +22,7 @@ import config from './common/config/config';
     }),
     Web3TransactionModule,
     FirebaseModule,
+    LuckyWheelModule,
   ],
   controllers: [AppController],
   providers: [AppService],

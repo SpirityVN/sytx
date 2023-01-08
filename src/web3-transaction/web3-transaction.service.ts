@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
 import { Contract, Event, EventFilter } from 'ethers';
-import _, { chunk, find, isEmpty, map, pick } from 'lodash';
+import { chunk, find, isEmpty, map, pick } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { BaseService } from 'src/_services/base.service';
-import { CreateContractInput, GetEventByTxHash, CreateNetworkInput, GetEventAll } from './web3-transaction.dto';
+import { CreateContractInput, CreateNetworkInput, GetEventAll, GetEventByTxHash } from './web3-transaction.dto';
 import { getABIByContract, getProviderByContract, getRangeBlocks, transformArgsEvent, transformEventByABI } from './web3-transaction.util';
 
 @Injectable()
