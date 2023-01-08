@@ -39,7 +39,9 @@ model network_support {
 }
 
 model lucky_wheel_reward {
-  
+  id     Int    @id @unique
+  name   String
+  weight Decimal  @db.Decimal(1,1)
 }
 
 enum NetworkSupportType {
