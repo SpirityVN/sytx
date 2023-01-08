@@ -1,5 +1,5 @@
 import { ApiTags } from '@nestjs/swagger';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { LuckyWheelService } from './lucky-wheel.service';
 
 @ApiTags('Lucky Wheel')
@@ -9,5 +9,10 @@ export class LuckyWheelController {
   @Get('/rewards')
   async getListReward() {
     return await this.luckyWheelService.getListReward();
+  }
+
+  @Post('/spin')
+  async spin() {
+    return await this.luckyWheelService.spin();
   }
 }
