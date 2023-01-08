@@ -7,7 +7,7 @@ export class LuckyWheelService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getListReward() {
-    let data = this.prismaService.lucky_wheel_reward.findMany();
+    let data = await this.prismaService.lucky_wheel_reward.findMany();
 
     console.log(data);
     return data;

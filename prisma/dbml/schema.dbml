@@ -28,7 +28,7 @@ Table network_support {
 Table lucky_wheel_reward {
   id Int [pk, unique]
   name String [not null]
-  weight Int [not null]
+  weight Float [not null]
 }
 
 Enum NetworkSupportType {
