@@ -26,4 +26,12 @@ export class LuckyWheelService {
       data: newReward,
     });
   }
+
+  async deleteReward(id: number) {
+    return await this.prismaService.lucky_wheel_reward.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 }

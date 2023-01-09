@@ -1,6 +1,6 @@
 import { CreateRewardDto } from './lucky-wheel.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { LuckyWheelService } from './lucky-wheel.service';
 
 @ApiTags('Lucky Wheel')
@@ -20,5 +20,10 @@ export class LuckyWheelController {
   @Post('/create-reward')
   async createReward(@Body() newReward: CreateRewardDto) {
     return await this.luckyWheelService.createReward(newReward);
+  }
+
+  @Delete('/delete-reward')
+  async deleteReward(@Param('id') id: number) {
+    return await this.luckyWheelService.deleteReward(id);
   }
 }
