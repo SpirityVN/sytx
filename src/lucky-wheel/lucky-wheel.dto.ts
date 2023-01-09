@@ -16,3 +16,10 @@ export class CreateRewardDto {
   @IsNotEmpty()
   weight: number;
 }
+
+export class DeleteRewardDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+}

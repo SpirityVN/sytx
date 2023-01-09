@@ -1,4 +1,4 @@
-import { CreateRewardDto } from './lucky-wheel.dto';
+import { CreateRewardDto, DeleteRewardDto } from './lucky-wheel.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { LuckyWheelService } from './lucky-wheel.service';
@@ -23,7 +23,7 @@ export class LuckyWheelController {
   }
 
   @Delete('/delete-reward')
-  async deleteReward(@Param('id') id: number) {
-    return await this.luckyWheelService.deleteReward(id);
+  async deleteReward(@Body() reward: DeleteRewardDto) {
+    return await this.luckyWheelService.deleteReward(reward.id);
   }
 }
