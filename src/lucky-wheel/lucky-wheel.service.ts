@@ -1,3 +1,4 @@
+import { CreateRewardDto } from './lucky-wheel.dto';
 import { Injectable } from '@nestjs/common';
 import { Sql } from '@prisma/client/runtime';
 import { map } from 'lodash';
@@ -18,5 +19,11 @@ export class LuckyWheelService {
     const weights = map(listReward, (reward) => reward.weight);
 
     return weightedRandom(listReward, weights);
+  }
+
+  async createReward(newReward: CreateRewardDto) {
+    return await this.prismaService.lucky_wheel_reward.create({
+      data: newReward,
+    });
   }
 }
