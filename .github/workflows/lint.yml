@@ -1,0 +1,11 @@
+name: check-lint
+
+on:
+  push:
+    branches:
+      - lucky-wheel
+
+jobs:
+  check-lint:
+    run-on: ubuntu-latest
+      
