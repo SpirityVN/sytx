@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { contract, network_support } from '@prisma/client';
 import { Contract, Event, EventFilter } from 'ethers';
 import { chunk, find, isEmpty, map, pick } from 'lodash';
@@ -10,7 +9,7 @@ import { getABIByContract, getProviderByContract, getRangeBlocks, transformArgsE
 
 @Injectable()
 export class Web3TransactionService extends BaseService {
-  constructor(private readonly configService: ConfigService, private readonly prismaService: PrismaService) {
+  constructor(private readonly prismaService: PrismaService) {
     super();
   }
 
