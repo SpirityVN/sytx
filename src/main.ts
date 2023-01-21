@@ -12,9 +12,23 @@ import { join } from 'path';
 import { SocketAdapter } from './adapter/socket.adapter';
 import helmet from '@fastify/helmet';
 import { contentParser } from 'fastify-multer';
-
+import fs from 'fs';
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  let httpsOptions = null;
+
+  if (process.env.NODE_ENV === 'dev') {
+    httpsOptions = {
+      key: fs.readFileSync('src/_key/cloudflare.key.pem'),
+      cert: fs.readFileSync('src/_key/cloudflare.cert.pem'),
+    };
+  }
+
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      https: httpsOptions,
+    }),
+  );
   app.useWebSocketAdapter(new SocketAdapter(app));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -111,7 +125,7 @@ async function bootstrap() {
     templates: join(__dirname, '..', 'views'),
   });
 
-  await app.listen(process.env.PORT || nestConfig.port || 3000, '0.0.0.0', (err, address) => {
+  await app.listen(process.env.PORT || nestConfig.port, '0.0.0.0', (err, address) => {
     console.log('Start app.server.address:', address);
     console.log('Start app.server.database:', process.env.DATABASE_URL as string);
     if (err) {
