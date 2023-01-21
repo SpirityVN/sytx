@@ -38,6 +38,12 @@ model network_support {
   contract           contract[]
 }
 
+model lucky_wheel_reward {
+  id     Int    @id @unique
+  name   String
+  weight Float
+}
+
 enum NetworkSupportType {
   testnet
   mainnet

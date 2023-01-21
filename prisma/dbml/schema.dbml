@@ -25,6 +25,12 @@ Table network_support {
   contract contract [not null]
 }
 
+Table lucky_wheel_reward {
+  id Int [pk, unique]
+  name String [not null]
+  weight Float [not null]
+}
+
 Enum NetworkSupportType {
   testnet
   mainnet
